@@ -13,6 +13,7 @@
 Adafruit_VEML7700 vem0 = Adafruit_VEML7700();
 Adafruit_VEML7700 vem1 = Adafruit_VEML7700();  
 
+// Scant all eight chanels to see what is connected
 void tcaselect(uint8_t i) {
   if (i > 7) return;
  
@@ -21,14 +22,16 @@ void tcaselect(uint8_t i) {
   Wire.endTransmission();  
 }
 
-
+/* Standard set-up fpr sevices */
 void setup(void)
 { 
-    // Couner of individual end nodes
-    uint8_t node_cnt = 0;
+    uint8_t node_cnt = 0; //Couner of individual end nodes. Jsto to know how many are up there.
+    uint8_t delay_local = 500; // How ofter to read values in variable
+    uint8_t tcaselect_0 = 0; //Which sensor to pick
+    uint8_t tcaselect_1 = 1; //Which sensor to pick
     
     while (!Serial);
-    delay(1000);
+    delay(delay_local);
 
     Wire.begin();
     
@@ -53,43 +56,54 @@ void setup(void)
     Serial.println("VEML7700 configuration: begins"); 
 
     /* Initialise the 1st sensor */
-    tcaselect(0);
+    tcaselect(tcaselect_0);
     if(!vem0.begin())
     {
-      /* There was a problem detecting the HMC5883 ... check your connections */
+      /* There was a problem detecting the 1st ALS ... check your connections */
       Serial.println("Ch.0, no device detected ... Check your wiring!");
       while(1);
     }
   
     /* Initialise the 2nd sensor */
-    tcaselect(1);
+    tcaselect(tcaselect_1);
     if(!vem1.begin())
     {
-      /* There was a problem detecting the HMC5883 ... check your connections */
+      /* There was a problem detecting the 12nd ALS ... check your connections */
       Serial.println("Ch.1, no device detected ... Check your wiring!");
       while(1);
     }
 
+    /* Pass sensor selection */
+    else
+    {
+      /* PASS message confirmation */
+      Serial.println("All ALS sensors intialized - PASS");
+      delay(5000);         
+    }
 }
 
 void loop()
 {
+    uint8_t delay_local = 500; // How ofter to read values in variable
+    
     /* Get a new sensor event */ 
-    float result_0 = 0;
-    float result_1 = 0;
+    float result_0 = 0; /* lux value for ALS.0 */
+    float result_1 = 0; /* lux value for ALS.1 */
      
-    /* Scan for all results */
+    /* Scan for all results. Need to pick each individually to read the proper chanel*/
+    /* Ch.0 READ  */
     tcaselect(0);
     result_0 = vem0.readLux();
+
+    /* Ch.1 READ  */
     tcaselect(1);
     result_1 = vem1.readLux();
-    delay(10);
+    delay(10); /* Settle time */
     
-    /* Display the results sensor 0 */
-    //Serial.print("Sensor #0 - ");
+    /* Display results to confirm each ALS works independently */
     Serial.print("Mux.0 & 1: "); Serial.print(result_0); Serial.print("  "); Serial.println(result_1);
 
-    delay(900);
+    delay(delay_local); /* Control how often cmd line spitts values out */
 }
 
 /*

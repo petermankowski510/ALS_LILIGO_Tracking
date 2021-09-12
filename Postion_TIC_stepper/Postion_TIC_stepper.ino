@@ -11,7 +11,7 @@
 // Tic.
 //
 // Please see https://github.com/pololu/tic-arduino for details
-// on how to make the connections between the Arduino and the
+// on how to make the connections between the Arduino and theerffrtgetgdsgsdfgsdfgdsfgsdfgsdfgsdfgsdfgsdf
 // Tic.
 
 #include <Tic.h>
